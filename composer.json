@@ -39,14 +39,25 @@
             "subType": "captcha",
             "forModule": "nailsapp/module-captcha",
             "data": {
-                "namespace": "Nails\\Captha\\Driver\\",
+                "namespace": "Nails\\Captcha\\Driver\\",
                 "class": "ReCaptcha",
                 "settings": [
                     {
-                        "key": "site_key",
-                        "label": "Site Key",
-                        "type": "password",
-                        "info": "You should get this from <a href=\"https://www.google.com/recaptcha/admin\" target=\"_blank\">Google</a>"
+                        "legend": "Site Keys",
+                        "fields": [
+                            {
+                                "key": "site_key_client",
+                                "label": "Client",
+                                "type": "password",
+                                "info": "You should get this from <a href=\"https://www.google.com/recaptcha/admin\" target=\"_blank\">Google</a>"
+                            },
+                            {
+                                "key": "site_key_server",
+                                "label": "Server",
+                                "type": "password",
+                                "info": "You should get this from <a href=\"https://www.google.com/recaptcha/admin\" target=\"_blank\">Google</a>"
+                            }
+                        ]
                     }
                 ]
             }
