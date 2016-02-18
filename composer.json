@@ -20,7 +20,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "nails/module-captcha": "dev-develop"
+        "nailsapp/module-captcha": "dev-develop"
     },
     "require-dev":
     {
