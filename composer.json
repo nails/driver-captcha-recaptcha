@@ -36,10 +36,19 @@
         {
             "name": "ReCaptcha",
             "type": "driver",
+            "subType": "captcha",
             "forModule": "nailsapp/module-captcha",
             "data": {
                 "namespace": "Nails\\Captha\\Driver\\",
-                "class": "ReCaptcha"
+                "class": "ReCaptcha",
+                "settings": [
+                    {
+                        "key": "site_key",
+                        "label": "Site Key",
+                        "type": "password",
+                        "info": "You should get this from <a href=\"https://www.google.com/recaptcha/admin\" target=\"_blank\">Google</a>"
+                    }
+                ]
             }
         }
     }
