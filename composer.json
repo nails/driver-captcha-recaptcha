@@ -47,13 +47,13 @@
                         "fields": [
                             {
                                 "key": "site_key_client",
-                                "label": "Client",
+                                "label": "Site Key",
                                 "type": "password",
                                 "info": "You should get this from <a href=\"https://www.google.com/recaptcha/admin\" target=\"_blank\">Google</a>"
                             },
                             {
                                 "key": "site_key_server",
-                                "label": "Server",
+                                "label": "Secret Key",
                                 "type": "password",
                                 "info": "You should get this from <a href=\"https://www.google.com/recaptcha/admin\" target=\"_blank\">Google</a>"
                             }
