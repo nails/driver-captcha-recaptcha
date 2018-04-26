@@ -16,23 +16,17 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
     {
         $sClientKey = appSetting('site_key_client', 'nailsapp/driver-captcha-recaptcha');
 
-        if ($sClientKey) {
-
-            $oAsset = Factory::service('Asset');
-            $oAsset->load('https://www.google.com/recaptcha/api.js');
-
-            $oOut        = new \stdClass();
-            $oOut->label = '';
-            $oOut->html  = '<div class="g-recaptcha" data-sitekey="' . $sClientKey . '"></div>';
-
-        } else {
-
-            $oOut        = new \stdClass();
-            $oOut->label = '';
-            $oOut->html  = '<p class="alert alert-danger">ReCaptcha not configured.</p>';
+        if (empty($sClientKey)) {
+            throw new CaptchaDriverException('ReCaptcha not configured.');
         }
 
-        return $oOut;
+        $oAsset = Factory::service('Asset');
+        $oAsset->load('https://www.google.com/recaptcha/api.js');
+
+        $oResponse = Factory::factory('CaptchaForm', 'nailsapp/module-captcha');
+        $oResponse->setHtml('<div class="g-recaptcha" data-sitekey="' . $sClientKey . '"></div>');
+
+        return $oResponse;
     }
 
     // --------------------------------------------------------------------------
@@ -54,34 +48,32 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
 
                 $oResponse = $oHttpClient->post(
                     'https://www.google.com/recaptcha/api/siteverify',
-                    array(
-                        'form_params' => array(
+                    [
+                        'form_params' => [
                             'secret'   => $sServerKey,
                             'response' => $oInput->post('g-recaptcha-response'),
-                            'remoteip' => $oInput->ipAddress()
-                        )
-                    )
+                            'remoteip' => $oInput->ipAddress(),
+                        ],
+                    ]
                 );
 
                 if ($oResponse->getStatusCode() !== 200) {
-                    throw new CaptchaDriverException('Google returned a non 200 response.', 1);
+                    throw new CaptchaDriverException('Google returned a non 200 response.');
                 }
 
                 $oResponse = json_decode((string) $oResponse->getBody());
 
                 if (empty($oResponse->success)) {
-                    throw new CaptchaDriverException('Google returned an unsuccessful response.', 1);
+                    throw new CaptchaDriverException('Google returned an unsuccessful response.');
                 }
 
                 return true;
 
             } catch (\Exception $e) {
-
                 return false;
             }
 
         } else {
-
             return false;
         }
     }
