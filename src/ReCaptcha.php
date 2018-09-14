@@ -14,7 +14,7 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
      */
     public function generate()
     {
-        $sClientKey = appSetting('site_key_client', 'nailsapp/driver-captcha-recaptcha');
+        $sClientKey = appSetting('site_key_client', 'nails/driver-captcha-recaptcha');
 
         if (empty($sClientKey)) {
             throw new CaptchaDriverException('ReCaptcha not configured.');
@@ -23,7 +23,7 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
         $oAsset = Factory::service('Asset');
         $oAsset->load('https://www.google.com/recaptcha/api.js');
 
-        $oResponse = Factory::factory('CaptchaForm', 'nailsapp/module-captcha');
+        $oResponse = Factory::factory('CaptchaForm', 'nails/module-captcha');
         $oResponse->setHtml('<div class="g-recaptcha" data-sitekey="' . $sClientKey . '"></div>');
 
         return $oResponse;
@@ -37,7 +37,7 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
      */
     public function verify()
     {
-        $sServerKey = appSetting('site_key_server', 'nailsapp/driver-captcha-recaptcha');
+        $sServerKey = appSetting('site_key_server', 'nails/driver-captcha-recaptcha');
 
         if ($sServerKey) {
 

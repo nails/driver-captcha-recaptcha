@@ -1,5 +1,5 @@
 {
-    "name": "nailsapp/driver-captcha-recaptcha",
+    "name": "nails/driver-captcha-recaptcha",
     "keywords": ["Nails", "Shed Collective", "CodeIgniter", "Captcha Module", "Driver", "Recaptcha"],
     "homepage": "http://nailsapp.co.uk/modules/captcha/driver/recaptcha",
     "description": "This is the \"ReCaptcha\" driver for the Nails Captcha module.",
@@ -20,7 +20,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {
-        "nailsapp/module-captcha": "dev-develop"
+        "nails/module-captcha": "dev-develop"
     },
     "require-dev":
     {
@@ -37,7 +37,7 @@
             "name": "ReCaptcha",
             "type": "driver",
             "subType": "captcha",
-            "forModule": "nailsapp/module-captcha",
+            "forModule": "nails/module-captcha",
             "data": {
                 "namespace": "Nails\\Captcha\\Driver\\",
                 "class": "ReCaptcha",
