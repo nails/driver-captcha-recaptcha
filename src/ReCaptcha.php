@@ -2,17 +2,25 @@
 
 namespace Nails\Captcha\Driver;
 
-use Nails\Factory;
-use Nails\Common\Driver\Base;
+use GuzzleHttp\Client;
 use Nails\Captcha\Exception\CaptchaDriverException;
+use Nails\Captcha\Factory\CaptchaForm;
+use Nails\Common\Driver\Base;
+use Nails\Common\Exception\FactoryException;
+use Nails\Common\Service\Asset;
+use Nails\Common\Service\Input;
+use Nails\Factory;
 
 class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
 {
     /**
      * Returns the form markup for the captcha
-     * @return string
+     *
+     * @return CaptchaForm
+     * @throws CaptchaDriverException
+     * @throws FactoryException
      */
-    public function generate()
+    public function generate(): CaptchaForm
     {
         $sClientKey = appSetting('site_key_client', 'nails/driver-captcha-recaptcha');
 
@@ -20,9 +28,11 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
             throw new CaptchaDriverException('ReCaptcha not configured.');
         }
 
+        /** @var Asset $oAsset */
         $oAsset = Factory::service('Asset');
         $oAsset->load('https://www.google.com/recaptcha/api.js');
 
+        /** @var CaptchaForm $oResponse */
         $oResponse = Factory::factory('CaptchaForm', 'nails/module-captcha');
         $oResponse->setHtml('<div class="g-recaptcha" data-sitekey="' . $sClientKey . '"></div>');
 
@@ -33,16 +43,26 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
 
     /**
      * Verifies a user's captcha entry from POST Data
-     * @return boolean
+     *
+     * @param string|null $sToken The token to verify
+     *
+     * @return bool
+     * @throws FactoryException
      */
-    public function verify()
+    public function verify(string $sToken = null): bool
     {
         $sServerKey = appSetting('site_key_server', 'nails/driver-captcha-recaptcha');
 
         if ($sServerKey) {
 
+            /** @var Client $oHttpClient */
             $oHttpClient = Factory::factory('HttpClient');
-            $oInput      = Factory::service('Input');
+            /** @var Input $oInput */
+            $oInput = Factory::service('Input');
+
+            if ($sToken === null) {
+                $sToken = $oInput->post('g-recaptcha-response');
+            }
 
             try {
 
@@ -51,7 +71,7 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
                     [
                         'form_params' => [
                             'secret'   => $sServerKey,
-                            'response' => $oInput->post('g-recaptcha-response'),
+                            'response' => $sToken,
                             'remoteip' => $oInput->ipAddress(),
                         ],
                     ]
@@ -69,7 +89,7 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
 
                 return true;
 
-            } catch (\Exception $e) {
+            } catch (CaptchaDriverException $e) {
                 return false;
             }
 
