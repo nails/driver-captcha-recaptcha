@@ -3,6 +3,7 @@
 namespace Nails\Captcha\Driver;
 
 use GuzzleHttp\Client;
+use Nails\Captcha\Constants;
 use Nails\Captcha\Exception\CaptchaDriverException;
 use Nails\Captcha\Factory\CaptchaForm;
 use Nails\Common\Driver\Base;
@@ -11,8 +12,25 @@ use Nails\Common\Service\Asset;
 use Nails\Common\Service\Input;
 use Nails\Factory;
 
+/**
+ * Class ReCaptcha
+ *
+ * @package Nails\Captcha\Driver
+ */
 class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
 {
+    /**
+     * Called during system boot, allows the driver to load assets etc
+     */
+    public function boot(): void
+    {
+        /** @var Asset $oAsset */
+        $oAsset = Factory::service('Asset');
+        $oAsset->load('https://www.google.com/recaptcha/api.js');
+    }
+
+    // --------------------------------------------------------------------------
+
     /**
      * Returns the form markup for the captcha
      *
@@ -28,12 +46,8 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
             throw new CaptchaDriverException('ReCaptcha not configured.');
         }
 
-        /** @var Asset $oAsset */
-        $oAsset = Factory::service('Asset');
-        $oAsset->load('https://www.google.com/recaptcha/api.js');
-
         /** @var CaptchaForm $oResponse */
-        $oResponse = Factory::factory('CaptchaForm', 'nails/module-captcha');
+        $oResponse = Factory::factory('CaptchaForm', Constants::MODULE_SLUG);
         $oResponse->setHtml('<div class="g-recaptcha" data-sitekey="' . $sClientKey . '"></div>');
 
         return $oResponse;
