@@ -1,11 +1,17 @@
 {
     "name": "nails/driver-captcha-recaptcha",
-    "keywords": ["Nails", "Shed Collective", "CodeIgniter", "Captcha Module", "Driver", "Recaptcha"],
+    "keywords": [
+        "Nails",
+        "Shed Collective",
+        "CodeIgniter",
+        "Captcha Module",
+        "Driver",
+        "Recaptcha"
+    ],
     "homepage": "http://nailsapp.co.uk/modules/captcha/driver/recaptcha",
     "description": "This is the \"ReCaptcha\" driver for the Nails Captcha module.",
     "license": "MIT",
-    "authors":
-    [
+    "authors": [
         {
             "name": "Pablo de la Pena",
             "email": "p@nailsapp.co.uk",
@@ -13,8 +19,7 @@
             "role": "Developer"
         }
     ],
-    "support":
-    {
+    "support": {
         "email": "hello@nailsapp.co.uk"
     },
     "minimum-stability": "dev",
@@ -22,44 +27,24 @@
     "require": {
         "nails/module-captcha": "dev-develop"
     },
-    "require-dev":
-    {
+    "require-dev": {
         "phpunit/phpunit": "9.*"
     },
-    "autoload":
-    {
-        "psr-4": {"Nails\\Captcha\\Driver\\": "src/"}
+    "autoload": {
+        "psr-4": {
+            "Nails\\Captcha\\Driver\\": "src/"
+        }
     },
-    "extra":
-    {
-        "nails" :
-        {
+    "extra": {
+        "nails": {
             "name": "ReCaptcha",
             "type": "driver",
             "subType": "captcha",
             "forModule": "nails/module-captcha",
+            "namespace": "Nails\\Captcha\\Driver\\",
             "data": {
                 "namespace": "Nails\\Captcha\\Driver\\",
-                "class": "ReCaptcha",
-                "settings": [
-                    {
-                        "legend": "Site Keys",
-                        "fields": [
-                            {
-                                "key": "site_key_client",
-                                "label": "Site Key",
-                                "type": "password",
-                                "info": "You should get this from <a href=\"https://www.google.com/recaptcha/admin\" target=\"_blank\">Google</a>"
-                            },
-                            {
-                                "key": "site_key_server",
-                                "label": "Secret Key",
-                                "type": "password",
-                                "info": "You should get this from <a href=\"https://www.google.com/recaptcha/admin\" target=\"_blank\">Google</a>"
-                            }
-                        ]
-                    }
-                ]
+                "class": "ReCaptcha"
             }
         }
     }
