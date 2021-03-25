@@ -1,6 +1,6 @@
 <?php
 
-namespace Nails\Captcha\Driver\Settings;
+namespace Nails\Captcha\Driver\ReCaptcha\Settings;
 
 use Nails\Common\Helper\Form;
 use Nails\Common\Interfaces;
@@ -11,7 +11,7 @@ use Nails\Factory;
 /**
  * Class ReCaptcha
  *
- * @package Nails\Captcha\Driver\Settings
+ * @package Nails\Captcha\Driver\ReCaptcha\Settings
  */
 class ReCaptcha implements Interfaces\Component\Settings
 {

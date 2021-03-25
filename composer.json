@@ -32,7 +32,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Nails\\Captcha\\Driver\\": "src/"
+            "Nails\\Captcha\\Driver\\": "src/",
+            "Nails\\Captcha\\Driver\\ReCaptcha\\": "src/ReCaptcha/"
         }
     },
     "extra": {
@@ -41,7 +42,7 @@
             "type": "driver",
             "subType": "captcha",
             "forModule": "nails/module-captcha",
-            "namespace": "Nails\\Captcha\\Driver\\",
+            "namespace": "Nails\\Captcha\\Driver\\ReCaptcha\\",
             "data": {
                 "namespace": "Nails\\Captcha\\Driver\\",
                 "class": "ReCaptcha"
