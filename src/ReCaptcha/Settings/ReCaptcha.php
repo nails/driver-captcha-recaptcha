@@ -33,6 +33,16 @@ class ReCaptcha implements Interfaces\Component\Settings
     /**
      * @inheritDoc
      */
+    public function getPermissions(): array
+    {
+        return [];
+    }
+
+    // --------------------------------------------------------------------------
+
+    /**
+     * @inheritDoc
+     */
     public function get(): array
     {
         /** @var Setting $oKeyClient */
