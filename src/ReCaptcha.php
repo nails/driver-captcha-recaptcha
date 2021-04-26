@@ -19,14 +19,28 @@ use Nails\Factory;
  */
 class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
 {
+    const RESPONSE_FIELD_KEY = 'g-recaptcha-response';
+
+    // --------------------------------------------------------------------------
+
     /**
      * Called during system boot, allows the driver to load assets etc
+     *
+     * @throws FactoryException
      */
     public function boot(): void
     {
         /** @var Asset $oAsset */
-        $oAsset = Factory::service('Asset');
-        $oAsset->load('https://www.google.com/recaptcha/api.js');
+        $oAsset     = Factory::service('Asset');
+        $sVersion   = appSetting(ReCaptcha\Settings\ReCaptcha::VERSION, ReCaptcha\Constants::MODULE_SLUG);
+        $sClientKey = appSetting(ReCaptcha\Settings\ReCaptcha::KEY_CLIENT, ReCaptcha\Constants::MODULE_SLUG);
+
+        if ($sVersion === ReCaptcha\Settings\ReCaptcha::VERSION_3) {
+            $oAsset->load('https://www.google.com/recaptcha/api.js?render=' . $sClientKey, null, Asset::TYPE_JS);
+
+        } else {
+            $oAsset->load('https://www.google.com/recaptcha/api.js');
+        }
     }
 
     // --------------------------------------------------------------------------
@@ -40,7 +54,8 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
      */
     public function generate(): CaptchaForm
     {
-        $sClientKey = appSetting('site_key_client', 'nails/driver-captcha-recaptcha');
+        $sVersion   = appSetting(ReCaptcha\Settings\ReCaptcha::VERSION, ReCaptcha\Constants::MODULE_SLUG);
+        $sClientKey = appSetting(ReCaptcha\Settings\ReCaptcha::KEY_CLIENT, ReCaptcha\Constants::MODULE_SLUG);
 
         if (empty($sClientKey)) {
             throw new CaptchaDriverException('ReCaptcha not configured.');
@@ -48,7 +63,45 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
 
         /** @var CaptchaForm $oResponse */
         $oResponse = Factory::factory('CaptchaForm', Constants::MODULE_SLUG);
-        $oResponse->setHtml('<div class="g-recaptcha" data-sitekey="' . $sClientKey . '"></div>');
+
+        if ($sVersion === ReCaptcha\Settings\ReCaptcha::VERSION_2) {
+
+            $sHtml = <<<EOT
+            <div class="g-recaptcha" data-sitekey="$sClientKey"></div>
+            EOT;
+
+        } elseif ($sVersion === ReCaptcha\Settings\ReCaptcha::VERSION_3) {
+
+            $sKey = static::RESPONSE_FIELD_KEY;
+            $sId  = 'recaptcha-field-' . uniqid();
+
+            $sHtml = <<<EOT
+            <input type="hidden" name="$sKey" id="$sId" />
+            <script>
+
+                var field = document.getElementById('$sId');
+                var form = field.closest('form');
+
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    grecaptcha
+                        .ready(function() {
+                            grecaptcha
+                                .execute('$sClientKey', {action: 'submit'})
+                                .then(function(token) {
+                                    field.value = token;
+                                    form.submit();
+                                });
+                        });
+                });
+            </script>
+            EOT;
+
+        } else {
+            throw new CaptchaDriverException('Unsupported captcha version defined.');
+        }
+
+        $oResponse->setHtml($sHtml);
 
         return $oResponse;
     }
@@ -65,7 +118,8 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
      */
     public function verify(string $sToken = null): bool
     {
-        $sServerKey = appSetting('site_key_server', 'nails/driver-captcha-recaptcha');
+        $sVersion   = appSetting(ReCaptcha\Settings\ReCaptcha::VERSION, ReCaptcha\Constants::MODULE_SLUG);
+        $sServerKey = appSetting(ReCaptcha\Settings\ReCaptcha::KEY_SERVER, ReCaptcha\Constants::MODULE_SLUG);
 
         if ($sServerKey) {
 
@@ -75,7 +129,7 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
             $oInput = Factory::service('Input');
 
             if ($sToken === null) {
-                $sToken = $oInput->post('g-recaptcha-response');
+                $sToken = $oInput->post(static::RESPONSE_FIELD_KEY);
             }
 
             try {
@@ -99,6 +153,17 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
 
                 if (empty($oResponse->success)) {
                     throw new CaptchaDriverException('Google returned an unsuccessful response.');
+                }
+
+                if ($sVersion === ReCaptcha\Settings\ReCaptcha::VERSION_3) {
+                    $fThreshold = (float) appSetting(ReCaptcha\Settings\ReCaptcha::V3_THRESHOLD, ReCaptcha\Constants::MODULE_SLUG);
+                    if ($oResponse->score < $fThreshold) {
+                        throw new CaptchaDriverException(sprintf(
+                            'The score of this response (%s) is below the threshold (%s).',
+                            $oResponse->score,
+                            $fThreshold
+                        ));
+                    }
                 }
 
                 return true;
