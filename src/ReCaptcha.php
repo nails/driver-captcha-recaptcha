@@ -101,7 +101,9 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
             throw new CaptchaDriverException('Unsupported captcha version defined.');
         }
 
-        $oResponse->setHtml($sHtml);
+        $oResponse
+            ->setHtml($sHtml)
+            ->setInvisible($sVersion === ReCaptcha\Settings\ReCaptcha::VERSION_3);
 
         return $oResponse;
     }
