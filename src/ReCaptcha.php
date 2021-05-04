@@ -77,7 +77,7 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
             $sAction = static::V3_ACTION;
 
             $sHtml = <<<EOT
-            <input type="text" name="$sKey" id="$sId" />
+            <input type="hidden" name="$sKey" id="$sId" />
             <script type="text/javascript">
 
                 window.addEventListener('DOMContentLoaded', function() {
