@@ -20,6 +20,7 @@ use Nails\Factory;
 class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
 {
     const RESPONSE_FIELD_KEY = 'g-recaptcha-response';
+    const V3_ACTION          = 'submit';
 
     // --------------------------------------------------------------------------
 
@@ -35,12 +36,11 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
         $sVersion   = appSetting(ReCaptcha\Settings\ReCaptcha::VERSION, ReCaptcha\Constants::MODULE_SLUG);
         $sClientKey = appSetting(ReCaptcha\Settings\ReCaptcha::KEY_CLIENT, ReCaptcha\Constants::MODULE_SLUG);
 
-        if ($sVersion === ReCaptcha\Settings\ReCaptcha::VERSION_3) {
-            $oAsset->load('https://www.google.com/recaptcha/api.js?render=' . $sClientKey, null, Asset::TYPE_JS);
+        $sJsUrl = $sVersion === ReCaptcha\Settings\ReCaptcha::VERSION_3
+            ? 'https://www.google.com/recaptcha/api.js?render=' . $sClientKey
+            : 'https://www.google.com/recaptcha/api.js';
 
-        } else {
-            $oAsset->load('https://www.google.com/recaptcha/api.js');
-        }
+        $oAsset->load($sJsUrl, null, $oAsset::TYPE_JS_HEADER);
     }
 
     // --------------------------------------------------------------------------
@@ -72,28 +72,33 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
 
         } elseif ($sVersion === ReCaptcha\Settings\ReCaptcha::VERSION_3) {
 
-            $sKey = static::RESPONSE_FIELD_KEY;
-            $sId  = 'recaptcha-field-' . uniqid();
+            $sKey    = static::RESPONSE_FIELD_KEY;
+            $sId     = 'recaptcha-field-' . uniqid();
+            $sAction = static::V3_ACTION;
 
             $sHtml = <<<EOT
-            <input type="hidden" name="$sKey" id="$sId" />
-            <script>
+            <input type="text" name="$sKey" id="$sId" />
+            <script type="text/javascript">
 
-                var field = document.getElementById('$sId');
-                var form = field.closest('form');
+                window.addEventListener('DOMContentLoaded', function() {
 
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    grecaptcha
-                        .ready(function() {
-                            grecaptcha
-                                .execute('$sClientKey', {action: 'submit'})
-                                .then(function(token) {
-                                    field.value = token;
-                                    form.submit();
-                                });
-                        });
+                    var field = document.getElementById('$sId');
+                    var form = field.closest('form');
+
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        grecaptcha
+                            .ready(function() {
+                                grecaptcha
+                                    .execute('$sClientKey', {action: '$sAction'})
+                                    .then(function(token) {
+                                        field.value = token;
+                                    });
+                            });
+                    });
+
                 });
+
             </script>
             EOT;
 
@@ -165,6 +170,8 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
                             $oResponse->score,
                             $fThreshold
                         ));
+                    } elseif ($oResponse->action !== static::V3_ACTION) {
+                        throw new CaptchaDriverException('Invalid action.');
                     }
                 }
 
