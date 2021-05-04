@@ -93,6 +93,7 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
                                     .execute('$sClientKey', {action: '$sAction'})
                                     .then(function(token) {
                                         field.value = token;
+                                        form.submit();
                                     });
                             });
                     });
