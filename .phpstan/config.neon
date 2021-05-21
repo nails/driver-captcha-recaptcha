@@ -1,5 +1,7 @@
 parameters:
-    level: 6
+    level: 8
     paths:
         - ../src
         - ../tests
+    scanFiles:
+        - ../vendor/nails/common/helpers/app_setting.php

@@ -157,6 +157,7 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
                     throw new CaptchaDriverException('Google returned a non 200 response.');
                 }
 
+                /** @property float $score $oResponse */
                 $oResponse = json_decode((string) $oResponse->getBody());
 
                 if (empty($oResponse->success)) {
@@ -164,14 +165,19 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
                 }
 
                 if ($sVersion === ReCaptcha\Settings\ReCaptcha::VERSION_3) {
+
+                    $fScore     = property_exists($oResponse, 'score') ? $oResponse->score : 0;
                     $fThreshold = (float) appSetting(ReCaptcha\Settings\ReCaptcha::V3_THRESHOLD, ReCaptcha\Constants::MODULE_SLUG);
-                    if ($oResponse->score < $fThreshold) {
+                    $sAction    = property_exists($oResponse, 'action') ? $oResponse->action : null;
+
+                    if ($fScore < $fThreshold) {
                         throw new CaptchaDriverException(sprintf(
                             'The score of this response (%s) is below the threshold (%s).',
-                            $oResponse->score,
+                            $fScore,
                             $fThreshold
                         ));
-                    } elseif ($oResponse->action !== static::V3_ACTION) {
+
+                    } elseif ($sAction !== static::V3_ACTION) {
                         throw new CaptchaDriverException('Invalid action.');
                     }
                 }
