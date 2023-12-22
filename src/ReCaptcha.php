@@ -40,7 +40,7 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
             ? 'https://www.google.com/recaptcha/api.js?render=' . $sClientKey
             : 'https://www.google.com/recaptcha/api.js';
 
-        $oAsset->load($sJsUrl, null, $oAsset::TYPE_JS_HEADER);
+        $oAsset->load($sJsUrl, null, $oAsset::TYPE_JS_HEADER, false, true);
     }
 
     // --------------------------------------------------------------------------
