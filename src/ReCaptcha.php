@@ -72,13 +72,14 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
 
         } elseif ($sVersion === ReCaptcha\Settings\ReCaptcha::VERSION_3) {
 
-            $sKey    = static::RESPONSE_FIELD_KEY;
-            $sId     = 'recaptcha-field-' . uniqid();
-            $sAction = static::V3_ACTION;
+            $sKey     = static::RESPONSE_FIELD_KEY;
+            $sId      = 'recaptcha-field-' . uniqid();
+            $sAction  = static::V3_ACTION;
+            $sOpenTag = scriptOpen();
 
             $sHtml = <<<EOT
             <input type="hidden" name="$sKey" id="$sId" />
-            <script type="text/javascript">
+            $sOpenTag
 
                 window.addEventListener('DOMContentLoaded', function() {
 
