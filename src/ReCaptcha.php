@@ -125,7 +125,7 @@ class ReCaptcha extends Base implements \Nails\Captcha\Interfaces\Driver
      * @return bool
      * @throws FactoryException
      */
-    public function verify(string $sToken = null): bool
+    public function verify(?string $sToken = null): bool
     {
         $sVersion   = appSetting(ReCaptcha\Settings\ReCaptcha::VERSION, ReCaptcha\Constants::MODULE_SLUG);
         $sServerKey = appSetting(ReCaptcha\Settings\ReCaptcha::KEY_SERVER, ReCaptcha\Constants::MODULE_SLUG);
