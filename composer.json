@@ -29,8 +29,8 @@
         "nails/module-captcha": "dev-develop"
     },
     "require-dev": {
-        "phpunit/phpunit": "10.*",
-        "phpstan/phpstan": "2.*"
+        "phpunit/phpunit": "^12.0",
+        "phpstan/phpstan": "^2.0"
     },
     "scripts": {
         "test": "./vendor/bin/phpunit",
