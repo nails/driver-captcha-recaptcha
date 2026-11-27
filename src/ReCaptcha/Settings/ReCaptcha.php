@@ -2,6 +2,7 @@
 
 namespace Nails\Captcha\Driver\ReCaptcha\Settings;
 
+use Nails\Captcha\Driver\ReCaptcha\Admin\Permission;
 use Nails\Common\Exception\ValidationException;
 use Nails\Common\Helper\Form;
 use Nails\Common\Interfaces;
@@ -39,9 +40,9 @@ class ReCaptcha implements Interfaces\Component\Settings
     /**
      * @inheritDoc
      */
-    public function getPermissions(): array
+    public function getPermission(): string
     {
-        return [];
+        return Permission\Settings\ReCaptcha::class;
     }
 
     // --------------------------------------------------------------------------
